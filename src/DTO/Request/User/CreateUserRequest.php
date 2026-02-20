@@ -16,17 +16,16 @@ class CreateUserRequest implements RequestContract
     {
         $dto = new static();
         foreach ($params as $key => $value) {
-            if (property_exists($dto, $key)) {
-                $dto->$key = strval($value);
-            } else {
-                throw new InvalidArgumentException("Property $key not found in class " . self::class);
+            if (!property_exists($dto, $key)) {
+                continue;
             }
+            $dto->$key = strval($value);
         }
         return $dto;
     }
 
     #[Assert\NotBlank(message: 'Логін є обов\'язковим')]
-    #[UniqueLogin]
+//    #[UniqueLogin]
     #[Assert\Length(
         min: 3,
         max: 8,

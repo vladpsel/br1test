@@ -8,6 +8,7 @@ namespace App\Service;
 //use App\DTO\User\UserResponse;
 //use App\Entity\User;
 use App\DTO\Request\User\CreateUserRequest;
+use App\DTO\Request\User\UpdateUserRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -67,5 +68,26 @@ class UserService
         $this->em->flush();
 
         return $user;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function update(UpdateUserRequest $object): User
+    {
+        $user = $this->userById($object->id);
+
+        $user->setLogin($object->login ?? $user->getLogin());
+        $user->setPassword(password_hash($object->password ?? $user->getPassword(), PASSWORD_BCRYPT));
+        $user->setPhone($object->phone ?? $user->getPhone());
+
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
+    }
+
+    private function checkUser(): void
+    {
+
     }
 }

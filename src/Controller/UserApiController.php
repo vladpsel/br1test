@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\Request\User\CreateUserRequest;
 use App\DTO\Request\User\GetUserRequest;
+use App\DTO\Request\User\UpdateUserRequest;
 use App\DTO\Response\ApiResponse;
 use App\Helpers\ValidationHelper;
 use App\Service\UserService;
@@ -47,7 +48,7 @@ final class UserApiController extends AbstractController
 
     /**
      * Обовязковий парам login pass phone
-     * Тільки адмін - (бо не розумію який функціонал несе для юзера)
+     * Тільки адмін - (бо не розумію який функціонал несе для юзера, юзер рееєструє юзерів - є їєрарїія чи ні, або логічна помилка, треба уточнення)
      * Відповідь id, login* phone* - не зовсім секюрно по ТЗ є питання на обговорення
      */
     #[Route('/api/v1/user', name: 'app_user_api_create', methods: ['POST'])]
@@ -74,12 +75,24 @@ final class UserApiController extends AbstractController
      * Обовязковий парам id login pass phone
      */
     #[Route('/api/v1/user', name: 'app_user_api_update', methods: ['PUT'])]
-    public function update(): JsonResponse
+    public function update(Request $request, ValidationHelper $validator): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserApiController.php',
-        ]);
+        try {
+            $user = $this->getUser();
+            $data = $validator->validate($request, new UpdateUserRequest());
+            $result = $this->service->setUser($user)->update($data);
+
+            return $this->json(new ApiResponse($result, 'User fetched successfully')->toArray(), 200, [], [
+                'groups' => ['user:update'],
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->json([
+                'type' => 'Error',
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
