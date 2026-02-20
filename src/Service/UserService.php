@@ -7,6 +7,7 @@ namespace App\Service;
 //use App\DTO\User\CreateUserRequest;
 //use App\DTO\User\UserResponse;
 //use App\Entity\User;
+use App\DTO\Request\User\CreateUserRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,22 +55,17 @@ class UserService
         return $current;
     }
 
-//    public function register(CreateUserRequest $object): User
-//    {
-//        $user = new User();
-//        $user->setLogin($object->login);
-//        $user->setPass(password_hash($object->pass, PASSWORD_BCRYPT));
-//        $user->setPhone($object->phone);
-//
-//        $this->em->persist($user);
-//        $this->em->flush();
-//
-//        return $user;
+    public function register(CreateUserRequest $object): User
+    {
+        $user = new User();
+        $user->setLogin($object->login);
+        $user->setPassword(password_hash($object->password, PASSWORD_BCRYPT));
+        $user->setPhone($object->phone);
+        $user->setRoles(['ROLE_USER']);
 
-//        return new UserResponse(
-//            $user->getId(),
-//            $user->getLogin(),
-//            $user->getPhone(),
-//        );
-//    }
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
 }
