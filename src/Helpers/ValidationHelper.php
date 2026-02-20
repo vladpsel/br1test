@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-use App\DTO\Request\RequestContract;
+use App\DTO\RequestContract;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationHelper
@@ -20,17 +20,7 @@ class ValidationHelper
 
     public function validate(Request $request, RequestContract $dtoClass): object
     {
-        $data = [];
-
-        $data = array_merge($data, $request->query->all());
-        $content = trim((string) $request->getContent());
-        if ($content !== '') {
-            $json = json_decode($content, true);
-            if (is_array($json)) {
-                $data = array_merge($data, $json);
-            }
-        }
-
+        $data = json_decode($request->getContent(), true) ?? [];
 
         $dto = $dtoClass::fromArray($data);
 
@@ -43,7 +33,7 @@ class ValidationHelper
             }
 
             $errString = implode(", \r\n", $messages);
-            throw new UnprocessableEntityHttpException($errString);
+            throw new ValidationException($errString);
         }
 
         return $dto;

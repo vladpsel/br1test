@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTO\User;
+
+use App\DTO\RequestContract;
+use InvalidArgumentException;
+use Symfony\Component\Validator\Constraints as Assert;
+
+final class CreateUserRequest implements RequestContract
+{
+    public static function fromArray(array $params): static
+    {
+        $dto = new static();
+        foreach ($params as $key => $value) {
+            if (property_exists($dto, $key)) {
+                $dto->$key = strval($value);
+            } else {
+                throw new InvalidArgumentException("Property $key not found in class " . self::class);
+            }
+        }
+        return $dto;
+    }
+
+    #[Assert\NotBlank(message: 'Login is required')]
+    #[Assert\Unique(message: 'This login is already used.')]
+    #[Assert\Length(
+        min: 3,
+        max: 8,
+        minMessage: 'Логін повинен бути довше {{ limit }} символів',
+        maxMessage: 'Занадто довгий логін',
+    )]
+    public string $login = '';
+
+    #[Assert\NotBlank(message: 'Password is required')]
+    #[Assert\Length(
+        min: 6,
+        max: 8,
+        minMessage: 'Пароль повинен бути довше {{ limit }} символів',
+        maxMessage: 'Занадто довгий пароль',
+    )]
+    public string $pass = '';
+
+    #[Assert\Regex(
+        pattern: '/^\+?[0-9]{10,15}$/',
+        message: 'Phone must be a valid number'
+    )]
+    public ?string $phone;
+}
