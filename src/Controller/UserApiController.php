@@ -100,12 +100,25 @@ final class UserApiController extends AbstractController
      */
     #[Route('/api/v1/user', name: 'app_user_api_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function delete(): JsonResponse
+    public function delete(Request $request, ValidationHelper $validator): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserApiController.php',
-        ]);
+        try {
+            $user = $this->getUser();
+            $data = $validator->validate($request, new GetUserRequest());
+            $result = $this->service->setUser($user)->delete($data->id);
+
+            return $this->json([
+                'message' => 'User removed successfully',
+                'id' => $data->id,
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->json([
+                'type' => 'Error',
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
 }

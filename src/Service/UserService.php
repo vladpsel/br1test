@@ -86,8 +86,10 @@ class UserService
         return $user;
     }
 
-    private function checkUser(): void
+    public function delete(int $userId)
     {
-
+        $user = $this->userById($userId);
+        $this->em->remove($user);
+        $this->em->flush();
     }
 }
