@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -12,12 +12,15 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:list', 'user:detail', 'user:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user:list', 'user:detail', 'user:write'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:list', 'user:detail', 'user:write'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]

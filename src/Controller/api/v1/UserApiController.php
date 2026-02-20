@@ -38,9 +38,8 @@ final class UserApiController extends AbstractController
             $data = $validator->validate($request, new CreateUserRequest());
             $result = $this->service->register($data);
 
-            return $this->json([
-                'message' => 'User registered',
-                'data' => $data,
+            return $this->json($result, 200, [], [
+                'groups' => ['user:list']  // вернёт только id, login
             ]);
         } catch (\Throwable $e) {
             return $this->json([
