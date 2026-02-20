@@ -20,7 +20,17 @@ class ValidationHelper
 
     public function validate(Request $request, RequestContract $dtoClass): object
     {
-        $data = json_decode($request->getContent(), true) ?? [];
+        $data = [];
+
+        $data = array_merge($data, $request->query->all());
+        $content = trim((string) $request->getContent());
+        if ($content !== '') {
+            $json = json_decode($content, true);
+            if (is_array($json)) {
+                $data = array_merge($data, $json);
+            }
+        }
+
 
         $dto = $dtoClass::fromArray($data);
 

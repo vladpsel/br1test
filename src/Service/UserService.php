@@ -7,44 +7,51 @@ namespace App\Service;
 //use App\DTO\User\CreateUserRequest;
 //use App\DTO\User\UserResponse;
 //use App\Entity\User;
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class UserService
 {
+    private ?User $user = null;
     public function __construct(
         private EntityManagerInterface $em,
         private Security $security,
+        private UserRepository $repository
     ) {
-        $this->em = $em;
-        $this->security = $security;
         $this->user = null;
     }
 
-    public function setUser(User $user)
+    public function setUser(User $user): self
     {
-
+        $this->user = $user;
+        return $this;
     }
 
-    public function getUser(UserRepository $repository)
+    /**
+     * @throws \Exception
+     */
+    public function userById(int $userId): ?User
     {
-        $user = $this->security->getUser();
-        if (!$user) {
-            throw new \RuntimeException('User not authenticated');
+        $current = $this->security->getUser();
+        if (!$current instanceof User) {
+            throw new \Exception('User not authenticated');
         }
 
-        // Не сама вдала реалізація, але поки не відомо вцілому архітектуру як фічі і доступ має відбуватися
-        // через фіче-флаги або контроль ролі і т.д. то зроблено так. + по ТЗ вказано що роути однакові
-        // В прод варіанті виносив би юзеру доступ до його аккаунту на роут /me
-        // а цей лишав би тільки адміну. Відповідно можливо було б повернути фікс тип замість mixed
         if ($this->security->isGranted('ROLE_ADMIN')) {
-            return $repository->findAll();
-        }
-        if ($this->security->isGranted('ROLE_USER')) {
+            $user = $this->repository->find($userId);
+            if (!$user) {
+                throw new \Exception('User not found');
+            }
             return $user;
         }
-        return null;
+
+        if ($current->getId() !== $userId) {
+            throw new \Exception('You are not allowed to access this user');
+        }
+
+        return $current;
     }
 
 //    public function register(CreateUserRequest $object): User

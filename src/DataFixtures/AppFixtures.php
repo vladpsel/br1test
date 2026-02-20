@@ -22,6 +22,7 @@ class AppFixtures extends Fixture
         $user->setLogin('admin');
         $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
         $user->setRoles(['ROLE_ADMIN']);
+        $user->setPhone('0991234567');
 
         $manager->persist($user);
         $manager->flush();
