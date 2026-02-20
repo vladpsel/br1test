@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DTO\User;
 
 use App\DTO\RequestContract;
+use App\Validation\UniqueLogin;
 use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -23,8 +24,8 @@ final class CreateUserRequest implements RequestContract
         return $dto;
     }
 
-    #[Assert\NotBlank(message: 'Login is required')]
-    #[Assert\Unique(message: 'This login is already used.')]
+    #[Assert\NotBlank(message: 'Логін є обов\'язковим')]
+    #[UniqueLogin]
     #[Assert\Length(
         min: 3,
         max: 8,

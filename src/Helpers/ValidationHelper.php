@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use App\DTO\RequestContract;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationHelper
@@ -33,7 +33,7 @@ class ValidationHelper
             }
 
             $errString = implode(", \r\n", $messages);
-            throw new ValidationException($errString);
+            throw new UnprocessableEntityHttpException($errString);
         }
 
         return $dto;
