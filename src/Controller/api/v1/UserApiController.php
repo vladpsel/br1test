@@ -2,6 +2,7 @@
 
 namespace App\Controller\api\v1;
 
+use App\DTO\Response\ApiResponse;
 use App\DTO\User\CreateUserRequest;
 use App\Helpers\ValidationHelper;
 use App\Service\UserService;
@@ -38,8 +39,13 @@ final class UserApiController extends AbstractController
             $data = $validator->validate($request, new CreateUserRequest());
             $result = $this->service->register($data);
 
-            return $this->json($result, 200, [], [
-                'groups' => ['user:list']  // вернёт только id, login
+            return $this->json(new ApiResponse(
+                $result,
+                'User created successfully',
+                200,
+            )->toArray(),
+                200, [],
+                ['groups' => ['user:list']
             ]);
         } catch (\Throwable $e) {
             return $this->json([
