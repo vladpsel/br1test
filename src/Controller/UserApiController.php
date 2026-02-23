@@ -105,7 +105,7 @@ final class UserApiController extends AbstractController
         try {
             $user = $this->getUser();
             $data = $validator->validate($request, new GetUserRequest());
-            $result = $this->service->setUser($user)->delete($data->id);
+            $this->service->setUser($user)->delete($data->id);
 
             return $this->json([
                 'message' => 'User removed successfully',
